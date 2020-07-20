@@ -1,0 +1,53 @@
+<html>
+    <head>
+       <title>Whatsapp Bot for busy people</title> 
+       <script type="text/javascript" src="qrcode.js"></script>
+       <script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket = io.connect('/');
+    socket.on('welcome', function(data) {
+        document.getElementById("title").innerHTML="Welcome to Whatsapp BOT for busy people";
+
+        
+    });
+
+    socket.on('qrcode',function(data){
+        
+        document.getElementById('qrcode').innerHTML=""
+        new QRCode(document.getElementById("qrcode"), data.code);
+    })
+    socket.on('log',function(data){
+        if(data.message==="Logged in successfully. The bot will now automatically reply to messages if your about is set to Busy")
+        {
+            document.getElementById('qrcode').style.display="none";
+        }
+        var parent=document.getElementById('logs');
+        var p=document.createElement('div');
+        p.setAttribute('style','display:block;text-align:center;padding-top:30px');
+        p.innerHTML=`${data.message+" "}  <span style="color:blue">${Date()}</span>`;
+        parent.appendChild(p);
+    })
+    socket.on('logout',function(data){
+        console.log("logout")
+        document.getElementById('relogin').style.display="block";
+    
+    })
+
+    function relogin(){
+        socket.emit('relogin',{});
+        document.getElementById('relogin').style.display="none";
+
+    }
+</script>
+    </head>
+    <body style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+        <h1 id="title" style="text-align: center;"></h1>
+        <div id="main" style="display: flex; align-items:center; justify-content: center; flex-direction: column;">
+            <div id="qrcode"></div>
+            <h3 style="text-align: center;">Your updates will appear here!</h2>
+            <div id="logs" style="display: flex;flex-direction: column; align-items: center; text-align: center;"></div>
+
+        </div>
+        <button id="relogin" style="display:none;margin-top: 30px;max-width: 250px;" onClick="relogin()">Click to Relogin</button>
+    </body>
+</html>
